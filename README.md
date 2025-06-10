@@ -1,3 +1,4 @@
+
 # 🎧 WhisperSubtitleGen
 
 > **Automatic `.srt` subtitle generation for offline videos using Faster-Whisper — fully offline.**  
@@ -12,6 +13,16 @@ This tool processes a large archive of **offline videos** to improve understandi
 
 It uses [Faster-Whisper](https://github.com/guillaumekln/faster-whisper) and works **completely offline**. The subtitles are saved next to each video, allowing automatic loading in players like VLC.  
 Используется [Faster-Whisper](https://github.com/guillaumekln/faster-whisper), работающий **полностью офлайн**. Субтитры сохраняются рядом с видео и автоматически подгружаются в VLC и других плеерах.
+
+---
+
+## 🆕 New Feature / Новая функция
+
+**✅ Progress tracking and recovery**  
+**📌 Отслеживание прогресса и восстановление**
+
+If the script is interrupted (e.g., power loss), it **saves progress** to a temporary file and **resumes** from where it left off on next launch.  
+Если выполнение прерывается (например, сбой питания), скрипт **сохраняет прогресс** во временный файл и **возобновляет** обработку с этого места при следующем запуске.
 
 ---
 
@@ -47,6 +58,7 @@ WhisperSubtitleGen/
 ├── run.sh                     # Linux launcher / Запуск на Linux
 ├── requirements.txt           # Dependencies / Зависимости
 ├── transcribe.log             # Log file (created automatically) / Лог-файл
+├── progress.txt               # Progress file (auto-managed) / Файл прогресса
 ```
 
 ---

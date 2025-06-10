@@ -44,7 +44,7 @@ def translate_srt(srt_path: Path, translator):
         translated_lines.extend(line + "\n" for line in translated_text)
         translated_lines.append("\n")
 
-    translated_path = srt_path.with_name(srt_path.stem + ".translated.srt")
+    translated_path = srt_path.with_name(srt_path.stem + ".RU.srt")
     with open(translated_path, "w", encoding="utf-8") as f:
         f.writelines(translated_lines)
 

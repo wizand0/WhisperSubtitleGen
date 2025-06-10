@@ -6,7 +6,7 @@ from progress_tracker import ProgressTracker
 
 SUPPORTED_EXTENSIONS = [
     ".mp4", ".mkv", ".avi", ".mov", ".flv", ".wmv", ".webm",
-    ".mp3", ".wav", ".m4a", ".aac", ".ogg"
+    ".mp3", ".m4a", ".aac", ".ogg"
 ]
 
 tracker = ProgressTracker()
