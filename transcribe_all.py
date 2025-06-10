@@ -5,6 +5,11 @@ from pathlib import Path
 from faster_whisper import WhisperModel
 import subprocess
 
+SUPPORTED_EXTENSIONS = [
+    ".mp4", ".mkv", ".avi", ".mov", ".flv", ".wmv", ".webm",
+    ".mp3", ".wav", ".m4a", ".aac", ".ogg"
+]
+
 def extract_audio(video_path: Path, audio_path: Path):
     subprocess.run([
         "ffmpeg", "-y", "-i", str(video_path),
@@ -50,7 +55,7 @@ def transcribe_video(model, video_path: Path, lang, batch_size, device):
             audio_path.unlink()
 
 def find_videos(root: Path):
-    return [p for p in root.rglob("*.mp4")]
+    return [p for ext in SUPPORTED_EXTENSIONS for p in root.rglob(f"*{ext}")]
 
 def main():
     parser = argparse.ArgumentParser()
@@ -68,10 +73,10 @@ def main():
             compute_type="int8" if args.device == "cpu" else "float16"
         )
     except RuntimeError as e:
-        print("❌ Ошибка при инициализации модели на CUDA:")
+        print("❌ Model initialization error (CUDA):")
         print(f"    {e}")
-        print("💡 Возможно, ваша система не поддерживает CUDA или драйверы не установлены.")
-        print("👉 Попробуйте снова, выбрав устройство: cpu")
+        print("💡 Your system might not support CUDA or drivers may be missing.")
+        print("👉 Try again with: --device cpu")
         return
 
     for video in find_videos(Path(".")):
