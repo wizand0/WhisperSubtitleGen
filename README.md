@@ -33,12 +33,14 @@
 
 ## 📦 Состав проекта
 
-WhisperSubtitleGen/
+```
+WhisperSubtitleGen/  
 ├── transcribe_recursive.py    # Основной скрипт  
 ├── run_transcribe.bat         # Запуск под Windows  
+├── run.sh                     # Запуск под Linux  
 ├── requirements.txt           # Зависимости  
 ├── transcribe.log             # Лог работы (создаётся автоматически)  
-
+```
 ---
 
 ## ⚙️ Установка FFmpeg (обязательно)
@@ -52,13 +54,26 @@ WhisperSubtitleGen/
    - Win + S → Переменные среды → Изменить `Path`
    - Добавить: `C:\ffmpeg\bin`
 4. Проверь:
+   ```bash
    ffmpeg -version
+   ```
+
+### Linux:
+
+Установи ffmpeg через пакетный менеджер:
+```bash
+sudo apt install ffmpeg
+```
+или
+```bash
+sudo pacman -S ffmpeg
+```
 
 ---
 
 ## 💻 Как запустить
 
-### ✅ Windows (рекомендуется)
+### ✅ Windows
 
 1. Скопируй:
    - `run_transcribe.bat`
@@ -72,12 +87,28 @@ WhisperSubtitleGen/
    - выполнит `transcribe_recursive.py`
 4. Субтитры (`.srt`) появятся рядом с видео
 
+### 🐧 Linux
+
+1. Скопируй:
+   - `run.sh`
+   - `transcribe_recursive.py`
+   - `requirements.txt`
+   в нужную папку с видео.
+2. Сделай скрипт исполняемым:
+   ```bash
+   chmod +x run.sh
+   ```
+3. Запусти:
+   ```bash
+   ./run.sh
+   ```
+
 ---
 
 ## 🔧 Конфигурация
 
-- В `run_transcribe.bat` можно указать:
-  ```
+- В `run_transcribe.bat` или `run.sh` можно указать:
+  ```bash
   set MODEL_SIZE=medium
   set LANGUAGE=ru
   ```
