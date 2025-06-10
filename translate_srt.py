@@ -1,53 +1,71 @@
-import os
 from pathlib import Path
-from transformers import MarianMTModel, MarianTokenizer
+from transformers import pipeline
+from progress_tracker import ProgressTracker
 
-os.environ["TRANSFORMERS_CACHE"] = str(Path(".cache").resolve())
+tracker = ProgressTracker()
 
-def read_srt(path):
+def translate_text(texts, translator):
+    return [translator(text)[0]["translation_text"] for text in texts]
+
+def split_srt_blocks(lines):
     blocks = []
-    with open(path, "r", encoding="utf-8") as f:
-        content = f.read().strip()
-        for block in content.split("\n\n"):
-            lines = block.strip().split("\n")
-            if len(lines) >= 3:
-                blocks.append((lines[0], lines[1], " ".join(lines[2:])))
+    current = []
+    for line in lines:
+        if line.strip() == "":
+            if current:
+                blocks.append(current)
+                current = []
+        else:
+            current.append(line)
+    if current:
+        blocks.append(current)
     return blocks
 
-def write_srt(path, blocks):
-    with open(path, "w", encoding="utf-8") as f:
-        for i, (idx, ts, text) in enumerate(blocks, 1):
-            f.write(f"{i}\n{ts}\n{text.strip()}\n\n")
+def translate_srt(srt_path: Path, translator):
+    with open(srt_path, "r", encoding="utf-8") as f:
+        lines = f.readlines()
 
-def translate_texts(texts, model, tokenizer, batch_size=8):
-    results = []
-    for i in range(0, len(texts), batch_size):
-        batch = texts[i:i + batch_size]
-        inputs = tokenizer(batch, return_tensors="pt", padding=True, truncation=True)
-        output = model.generate(**inputs)
-        translated = tokenizer.batch_decode(output, skip_special_tokens=True)
-        results.extend(translated)
-    return results
+    blocks = split_srt_blocks(lines)
+    translated_lines = []
 
-def main():
-    model_name = "Helsinki-NLP/opus-mt-en-ru"
-    tokenizer = MarianTokenizer.from_pretrained(model_name)
-    model = MarianMTModel.from_pretrained(model_name)
-
-    for srt_path in Path(".").rglob("*.srt"):
-        if srt_path.name.endswith(".ru.srt"):
+    for block in blocks:
+        if len(block) < 3:
+            translated_lines.extend(block + ["\n"])
             continue
 
-        print(f"🌍 Translating: {srt_path.name}")
-        blocks = read_srt(srt_path)
-        texts = [text for _, _, text in blocks]
+        index = block[0].strip()
+        time_range = block[1].strip()
+        text_lines = [line.strip() for line in block[2:]]
 
-        translated = translate_texts(texts, model, tokenizer)
-        new_blocks = [(idx, ts, text) for (idx, ts, _), text in zip(blocks, translated)]
+        translated_text = translate_text(text_lines, translator)
 
-        ru_path = srt_path.with_name(srt_path.stem + ".ru.srt")
-        write_srt(ru_path, new_blocks)
-        print(f"✅ Saved: {ru_path.name}")
+        translated_lines.append(index + "\n")
+        translated_lines.append(time_range + "\n")
+        translated_lines.extend(line + "\n" for line in translated_text)
+        translated_lines.append("\n")
+
+    translated_path = srt_path.with_name(srt_path.stem + ".translated.srt")
+    with open(translated_path, "w", encoding="utf-8") as f:
+        f.writelines(translated_lines)
+
+    print(f"✅ Translated: {translated_path.name}")
+
+def main():
+    print("📦 Loading translation model...")
+    translator = pipeline("translation", model="Helsinki-NLP/opus-mt-en-ru")
+
+    all_srts = list(Path(".").rglob("*.srt"))
+    remaining = [p for p in all_srts if ".translated.srt" not in p.name and not tracker.is_done("translate", p)]
+
+    print(f"📁 Found {len(all_srts)} .srt files. {len(remaining)} to translate.")
+
+    for idx, srt_path in enumerate(remaining, 1):
+        print(f"🌍 [{idx}/{len(remaining)}] Translating: {srt_path.name}")
+        try:
+            translate_srt(srt_path, translator)
+            tracker.mark_done("translate", srt_path)
+        except Exception as e:
+            print(f"❌ Error translating {srt_path.name}: {e}")
 
 if __name__ == "__main__":
     main()

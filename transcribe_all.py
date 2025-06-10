@@ -1,14 +1,15 @@
-# transcribe_all.py
-import os
 import argparse
 from pathlib import Path
 from faster_whisper import WhisperModel
 import subprocess
+from progress_tracker import ProgressTracker
 
 SUPPORTED_EXTENSIONS = [
     ".mp4", ".mkv", ".avi", ".mov", ".flv", ".wmv", ".webm",
     ".mp3", ".wav", ".m4a", ".aac", ".ogg"
 ]
+
+tracker = ProgressTracker()
 
 def extract_audio(video_path: Path, audio_path: Path):
     subprocess.run([
@@ -23,30 +24,24 @@ def write_srt(segments, srt_path: Path):
         secs = int(seconds % 60)
         millis = int((seconds - int(seconds)) * 1000)
         return f"{hrs:02}:{mins:02}:{secs:02},{millis:03}"
-
     with open(srt_path, "w", encoding="utf-8") as f:
         for i, segment in enumerate(segments, 1):
-            start = format_timestamp(segment.start)
-            end = format_timestamp(segment.end)
-            f.write(f"{i}\n{start} --> {end}\n{segment.text.strip()}\n\n")
+            f.write(f"{i}\n{format_timestamp(segment.start)} --> {format_timestamp(segment.end)}\n{segment.text.strip()}\n\n")
 
 def transcribe_video(model, video_path: Path, lang, batch_size, device):
     audio_path = video_path.with_suffix(".wav")
     try:
         extract_audio(video_path, audio_path)
-
         segments, _ = model.transcribe(
             str(audio_path),
             language=lang,
             beam_size=5,
             task="transcribe"
         )
-
         segments = list(segments)
         if not segments:
             print(f"⚠️ No speech recognized in: {video_path.name}")
             return
-
         srt_path = video_path.with_suffix(".srt")
         write_srt(segments, srt_path)
         print(f"✅ Created: {srt_path.name}")
@@ -73,16 +68,20 @@ def main():
             compute_type="int8" if args.device == "cpu" else "float16"
         )
     except RuntimeError as e:
-        print("❌ Model initialization error (CUDA):")
+        print("❌ CUDA initialization error:")
         print(f"    {e}")
-        print("💡 Your system might not support CUDA or drivers may be missing.")
-        print("👉 Try again with: --device cpu")
+        print("💡 Try again using --device cpu")
         return
 
-    for video in find_videos(Path(".")):
-        print(f"🎧 Processing: {video.name}")
+    all_videos = find_videos(Path("."))
+    remaining = [v for v in all_videos if not tracker.is_done("transcribe", v)]
+    print(f"📁 Found {len(all_videos)} media files. {len(remaining)} to process.")
+
+    for idx, video in enumerate(remaining, 1):
+        print(f"🎧 [{idx}/{len(remaining)}] Processing: {video.name}")
         try:
             transcribe_video(model, video, args.lang, args.batch_size, args.device)
+            tracker.mark_done("transcribe", video)
         except Exception as e:
             print(f"❌ Error processing {video.name}: {e}")
 
