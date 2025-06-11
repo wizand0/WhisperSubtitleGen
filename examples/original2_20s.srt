@@ -1,0 +1,12 @@
+1
+00:00:00,000 --> 00:00:07,759
+Hello again everyone, so hacking is not just about breaking into system or stealing data.
+
+2
+00:00:07,759 --> 00:00:14,560
+It is a vast skill that involves understanding how computer system works, how network work,
+
+3
+00:00:14,560 --> 00:00:20,000
+and how to identify and fix potential vulnerabilities, how to attack and differences.
+

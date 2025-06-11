@@ -1,0 +1,16 @@
+1
+00:00:00,000 --> 00:00:06,560
+Hello everyone welcome to this lecture I am so excited to start the course with you
+
+2
+00:00:06,560 --> 00:00:12,759
+so I am another instructor in this comprehensive course and I'm a professional
+
+3
+00:00:12,759 --> 00:00:18,839
+ethical hacker, computer scientist and I have more than 10 plus years of experience
+
+4
+00:00:18,839 --> 00:00:20,839
+as a cyber security
+
