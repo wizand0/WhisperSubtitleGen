@@ -55,7 +55,18 @@ def main():
     translator = pipeline("translation", model="Helsinki-NLP/opus-mt-en-ru")
 
     all_srts = list(Path(".").rglob("*.srt"))
-    remaining = [p for p in all_srts if ".translated.srt" not in p.name and not tracker.is_done("translate", p)]
+    remaining = []
+    for p in all_srts:
+        if ".translated.srt" in p.name:
+            continue
+        ru_srt = p.with_name(p.stem + ".RU.srt")
+        if ru_srt.exists():
+            # Добавим в лог, если еще не было
+            if not tracker.is_done("translate", p):
+                tracker.mark_done("translate", p)
+            continue
+        if not tracker.is_done("translate", p):
+            remaining.append(p)
 
     print(f"📁 Found {len(all_srts)} .srt files. {len(remaining)} to translate.")
 

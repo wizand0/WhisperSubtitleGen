@@ -1,8 +1,13 @@
 
 # 🎧 WhisperSubtitleGen
 
+## ** В новой версии Онлайн генерация РУССКОЙ ОЗВУЧКИ**
+## ** ATTENTION!!! You need ONLY Python 3.10! Only this version, NOT OTHER**
+## ** Внимание!!! Версия Python 3.10! Только эта версия нужна, другие не подойдут!**
+
 > **Automatic `.srt` subtitle generation for offline videos using Faster-Whisper — fully offline.**  
 > **Автоматическая генерация субтитров `.srt` для офлайн-видео с помощью Faster-Whisper — полностью офлайн.**
+
 
 ---
 
@@ -10,6 +15,8 @@
 
 This tool processes a large archive of **offline videos** to improve understanding and productivity during review. It generates `.srt` subtitles for each video file found in a folder and subfolders.  
 Этот инструмент предназначен для обработки большого архива **офлайн-видео** и генерации к ним `.srt` субтитров, что помогает лучше понимать материал и пересматривать видео.
+
+** ATTENTION!!! You need ONLY Python 3.10! Only this version, NOT OTHER**
 
 It uses [Faster-Whisper](https://github.com/guillaumekln/faster-whisper) and works **completely offline**. The subtitles are saved next to each video, allowing automatic loading in players like VLC.  
 Используется [Faster-Whisper](https://github.com/guillaumekln/faster-whisper), работающий **полностью офлайн**. Субтитры сохраняются рядом с видео и автоматически подгружаются в VLC и других плеерах.
@@ -29,7 +36,7 @@ If the script is interrupted (e.g., power loss), it **saves progress** to a temp
 ## 🧠 Technologies / Используемые технологии
 
 - Faster-Whisper (ONNX + CTranslate2)
-- Python 3.10+
+- Python 3.10
 - ffmpeg (required / обязателен)
 
 ---
