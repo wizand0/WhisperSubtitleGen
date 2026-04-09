@@ -70,6 +70,10 @@ WhisperSubtitleGen/
 1. Убедитесь, что установлен **Python 3.10**  
    Make sure **Python 3.10** is installed
 
+⚠️ IMPORTANT (Windows):
+Install Microsoft Visual C++ Redistributable:
+https://aka.ms/vs/17/release/vc_redist.x64.exe
+
 2. Дважды кликните `run.bat`  
    Double-click `run.bat`
 

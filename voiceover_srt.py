@@ -1,3 +1,4 @@
+#voiceover_srt.py
 import os
 import hashlib
 import subprocess
@@ -32,7 +33,9 @@ def generate_voiceover(voice_gender: str, replace_original: bool):
     voice = VOICE_MAP.get(voice_gender.lower(), "ru-RU-DmitryNeural")
 
     for srt_file in Path(".").rglob("*.RU.srt"):
-        video_file = Path(srt_file.name.replace(".RU.srt", ".mp4")).resolve()
+        # video_file = Path(srt_file.name.replace(".RU.srt", ".mp4")).resolve()
+        # video_file = srt_file.with_name(srt_file.name.replace(".RU.srt", ".mp4"))
+        video_file = srt_file.parent / srt_file.name.replace(".RU.srt", ".mp4")
         if not video_file.exists():
             print(f"⚠️ Video not found for: {srt_file.name}")
             continue
