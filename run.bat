@@ -2,15 +2,38 @@
 chcp 65001 >nul
 setlocal enabledelayedexpansion
 
-:: ?? Set path to Python 3.10
-set PYTHON310="C:\Program Files\Python310\python.exe"
+:: Try to find Python 3.10 using py launcher
+where py >nul 2>nul
+if %errorlevel%==0 (
+    py -3.10 --version >nul 2>nul
+    if %errorlevel%==0 (
+        set PYTHON310=py -3.10
+    )
+)
 
-if not exist %PYTHON310% (
-    echo ? Python 3.10 not found at %PYTHON310%
-    echo Please install it from https://www.python.org/downloads/release/python-3100/
+:: If not found, fallback to python in PATH
+if not defined PYTHON310 (
+    where python >nul 2>nul
+    if %errorlevel%==0 (
+        for /f "tokens=2 delims= " %%v in ('python --version 2^>^&1') do (
+            echo %%v | findstr "3.10" >nul
+            if not errorlevel 1 (
+                set PYTHON310=python
+            )
+        )
+    )
+)
+
+:: If still not found — error
+if not defined PYTHON310 (
+    echo ❌ Python 3.10 not found!
+    echo Please install Python 3.10 from:
+    echo https://www.python.org/downloads/release/python-3100/
     pause
     exit /b
 )
+
+echo ✅ Using Python: %PYTHON310%
 
 :: ?? Ask model size
 echo Available models: base (~142MB), small (~466MB), medium (~1.5GB), large-v2 (~2.9GB)
@@ -83,10 +106,15 @@ if not exist .venv (
 
 call .venv\Scripts\activate.bat
 
-:: ?? Install dependencies
 echo Installing dependencies...
-python -m pip install --upgrade pip >nul
-python -m pip install -r requirements.txt >nul 2>nul
+
+python -m pip install --upgrade pip
+
+echo Installing PyTorch (CPU)...
+pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+echo Installing other dependencies...
+pip install -r requirements.txt
 
 :: ?? Start transcription
 echo Starting transcription...
